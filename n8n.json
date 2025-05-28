@@ -1,0 +1,160 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Quiero ver todos mis mensajes\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Eres un asistente muy útil.\nHoy es {{ $now }}.\nDirectrices:\n- Cuando busque correos electronicos, firltre los correos promocionales.\n- Al resumir los mensajes, incluya el remitente, la fecha del mensaje, el asunto y un breve resumen del mensaje.\n- Si el usuario no especificó una fecha en la solicitud, suponga que está pidiendo el día de hoy\n- Utilice la herramienta baserow para responder a preguntas sobre tareas\n- Cuando responda a preguntas sobre eventos del calendario, filtre los eventos que no se apliquen a la pregunta. Por ejemplo, si la pregunta es sobre eventos de hoy, responde sólo con eventos de hoy. No menciones eventos futuros si faltan más de una semana.\nDevuelve estrictamente la siguiente estructura JSON sin ninguna explicación adicional:\n\n{\n  \"mails\": [\n    {\n      \"from\": \"Nombre del remitente\",\n      \"date\": \"Fecha en formato YYYY-MM-DD\",\n      \"subject\": \"Asunto del correo\",\n      \"summary\": \"Resumen breve del mensaje\"\n    }\n  ]\n}\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -80,
+        -120
+      ],
+      "id": "482f6b93-dd39-4b9f-bce3-bc48da98143d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "filters": {
+          "readStatus": "both"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        -40,
+        160
+      ],
+      "id": "eb711b6b-cc15-4008-9d62-bbe69f0f41c1",
+      "name": "Gmail",
+      "webhookId": "2c58c2fe-1868-46b2-b2e4-57be1e49a802"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mails",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -420,
+        -120
+      ],
+      "id": "36c1582f-5ce0-4afb-9379-326e5a9c53d3",
+      "name": "Webhook",
+      "webhookId": "2efad307-bdf8-4754-8084-9aca01272554"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        100
+      ],
+      "id": "c0dae554-9c8c-4747-ac0e-bdbf59c881e5",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.2,
+      "position": [
+        340,
+        -120
+      ],
+      "id": "e3963930-511f-4aff-888b-1fdd600848c6",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"mails\": [\n    {\n      \"from\": \"string\",\n      \"date\": \"string (YYYY-MM-DD)\",\n      \"subject\": \"string\",\n      \"summary\": \"string\"\n    }\n  ]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        100,
+        140
+      ],
+      "id": "124841a1-7af4-4d5f-a4cb-5b8d9b3c326c",
+      "name": "Structured Output Parser"
+    }
+  ],
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "f81d792e98fca4d5ffd789a5908cee4b3f282faa835fa9a033abb6729a0bffa7"
+  }
+}

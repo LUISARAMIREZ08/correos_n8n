@@ -1,0 +1,35 @@
+.container-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    top: 0;
+    position: fixed;
+    width: 100%;
+    background-color: #111655;
+    /*backdrop-filter: blur(10px);*/
+    padding-inline: 5rem;
+    box-sizing: border-box;
+    transition: 0.5s ease, color 0.5s ease;
+}
+
+.title-header {
+    color: white;
+    cursor: pointer;
+    transition: 0.5s ease, color 0.5s ease;
+    font-size: 1.3rem;
+}
+
+.container-navbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.container-navbar a {
+  color: white;
+  text-decoration: none;
+  font-size: 14px;
+  cursor: pointer;
+}
