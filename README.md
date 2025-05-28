@@ -51,7 +51,7 @@ Todo está orquestado mediante Docker y Docker Compose, lo que permite ejecutar 
 - El flujo incluye un agente de IA que puede ser personalizado:
   
   - Puedes editar el prompt del agente directamente en el nodo correspondiente.
-  - Es posible cambiar el modelo de IA (por ejemplo, GPT-4, GPT-3.5 u otro) si el nodo lo permite.
+  - Es posible cambiar el modelo de IA.
   - Asegúrate de configurar correctamente la clave de API del proveedor de IA (OpenAI, Gemini, etc.).
 
 **En el frontend (show-mail)**
